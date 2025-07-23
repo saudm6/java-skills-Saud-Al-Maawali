@@ -3,6 +3,7 @@ public class PayrollCalculator {
     public static void main (String[] args){
         System.out.println(calculateWeeklyPay("FULL_TIME", 55, 30.0));
         System.out.println(calculateTaxDeduction(1500, true));
+        processPayroll(new String[]{"FULL_TIME", "INTERN", "PART_TIME"}, new double[]{50, 20, 29}, new double[]{30, 15, 22}, new String[]{"Mohd", "Ali", "Ahmed"}, new double[]{45, 55, 15});
     }
 
     public static double calculateWeeklyPay(String employeeType, double hoursWorked, double hourlyRate) {
@@ -35,6 +36,7 @@ public class PayrollCalculator {
                 throw new IllegalArgumentException("Invalid employee type: " + employeeType);
         }
         return final_pay;
+
     }
 
     public static double calculateTaxDeduction(double grossPay, boolean hasHealthInsurance){
@@ -58,12 +60,51 @@ public class PayrollCalculator {
         return total_tax_amount;
     }
 
-    public static void processPayroll(String[] employeeTypes, double[] hours, double[] rates, String[] names) {
+    public static void processPayroll(String[] employeeTypes, double[] hours, double[] rates, String[] names, double[] working_hours) {
 
-        String[] final_employeeTypes = {};
-        double[] final_hours = {};
-        double[] final_rates = {};
-        String[] final_names = {};
+        double[] final_pay = new double[names.length];
+        double[] final_pay_2 = new double[names.length];
 
+        double highest_pay = 0;
+        double lowest_pay = 0;
+        double avg_pay = 0;
+        double employee_overtime = 0;
+        double total_pay = 0.0;
+
+        System.out.println("\n\n === STARTING PAYROLL PROCESS === ");
+        for (int i = 0; i < names.length; i++){
+            final_pay[i] = calculateWeeklyPay(employeeTypes[i], hours[i], rates[i]);
+
+            if (working_hours[i] > 40 && employeeTypes[i].equals("FULL_TIME")){
+                employee_overtime += 1;
+
+            }
+
+            if (final_pay[i] > highest_pay) {
+                highest_pay = final_pay[i];
+            }
+
+            if (i == 0) {
+                lowest_pay = final_pay[i];
+            }
+
+            else if (final_pay[i] < lowest_pay){
+                lowest_pay = final_pay[i];
+            }
+            total_pay += final_pay[i];
+        }
+        avg_pay = total_pay / names.length;
+
+        for (int i = 0; i < names.length ; i++) {
+            final_pay_2[i] = calculateWeeklyPay(employeeTypes[i], hours[i], rates[i]);
+
+            if (final_pay_2[i] == highest_pay) {
+                System.out.println("\nHighest Payed Emp " + names[i] + " with a pay of " + highest_pay);
+            } else if (final_pay_2[i] == lowest_pay) {
+                System.out.println("\nLowest Payed Emp " + names[i] + " with a pay of " + lowest_pay);
+            }
+        }
+        System.out.println("\nNumber of employees who achived overtime is " + employee_overtime);
+        System.out.println("\nAverage Pay is " + avg_pay);
     }
 }
